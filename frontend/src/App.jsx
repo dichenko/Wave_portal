@@ -14,6 +14,7 @@ const App = () => {
   const contractABI = abi.abi;
   const [waveLoader, setWaveLoader] = useState(false);
   const [sendMessageLoader, setSendMessageLoader] = useState(false);
+  const [waveError, setWaveError] = useState("");
 
   const getAllWaves = async () => {
     try {
@@ -56,41 +57,6 @@ const App = () => {
       setWaveLoader(false);
     }
   };
-
-  useEffect(() => {
-    let wavePortalContract;
-  
-    const onNewWave = (from, timestamp, message) => {
-      console.log("NewWave", from, timestamp, message);
-      setAllWaves((prevState) => [
-        ...prevState,
-        {
-          address: from,
-          timestamp: new Date(timestamp * 1000),
-          message: message,
-        },
-      ]);
-    };
-  
-    if (window.ethereum) {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-  
-      wavePortalContract = new ethers.Contract(
-        contractAddress,
-        contractABI,
-        signer
-      );
-      wavePortalContract.on("NewWave", onNewWave);
-    }
-  
-    return () => {
-      if (wavePortalContract) {
-        wavePortalContract.off("NewWave", onNewWave);
-      }
-    };
-  }, []);
-
 
   const checkIfWalletIsConnected = async () => {
     try {
@@ -141,6 +107,7 @@ const App = () => {
   };
 
   const wave = async (t) => {
+    setWaveError("");
     try {
       const { ethereum } = window;
 
@@ -157,13 +124,16 @@ const App = () => {
         console.log("Mining...", waveTxn.hash);
         await waveTxn.wait();
         console.log("Mined -- ", waveTxn.hash);
-        setSendMessageLoader(false);
+
         await getAllWaves();
       } else {
         console.log("Ethereum object doesn't exist!");
       }
     } catch (error) {
       console.log(error);
+      setWaveError(error);
+    } finally {
+      setSendMessageLoader(false);
     }
   };
 
@@ -188,11 +158,20 @@ const App = () => {
         <hr className="col-12 mb-5 mt-5" />
 
         {sendMessageLoader && (
-          <div class="alert alert-success" role="alert">
-            <h4 class="alert-heading">Well done!</h4>
+          <div className="alert alert-success" role="alert">
+            <h4 className="alert-heading">Well done!</h4>
             <p>
               Confirm transaction and wait until miners pack your message into
               the blockchain. It can take up to 3 min.
+            </p>
+          </div>
+        )}
+
+        {(waveError != "") && (
+          <div className="alert alert-danger" role="alert">
+            <h4 className="alert-heading">Not So Fast, Cowboy!</h4>
+            <p>
+              Take a break and cooldown for 15 min.
             </p>
           </div>
         )}
@@ -239,15 +218,14 @@ const App = () => {
         )}
 
         {waveLoader && (
-          <div class="alert alert-info" role="alert">
+          <div className="alert alert-info" role="alert">
             is loading...
           </div>
         )}
-
+        <hr className="col-12 mb-5 mt-5" />
         {
           <div className="row mt-8">
             <div className="col ">
-              {" "}
               <p className="">📮 Received {allWaves.length} messages:</p>
             </div>
           </div>
@@ -257,7 +235,7 @@ const App = () => {
           allWaves.map((wave, index) => {
             return (
               <div className="card my-3 " key={index}>
-                <div class="card-header">
+                <div className="card-header">
                   {wave.timestamp.toString().slice(0, 25)}
                 </div>
                 <div className="p-2 fs-6 text">from: {wave.address}</div>

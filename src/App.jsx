@@ -41,9 +41,9 @@ const App = () => {
         });
 
         let wavesReversed = [];
-        wavesCleaned.forEach(e => {
-            wavesReversed.unshift(e)
-        })
+        wavesCleaned.forEach((e) => {
+          wavesReversed.unshift(e);
+        });
         /*
          * Store our data in React State
          */
@@ -152,29 +152,31 @@ const App = () => {
           right? Connect your Ethereum wallet and wave at me!
         </div>
 
-        {currentAccount && (<div className="row" >
-          <form onSubmit={handleFormSubmit} className="">
-            <div className="col" >
-            <label htmlFor="sendMessage" className="form-label">Your message</label>
-            <input
-              id="sendMessage"
-              className="form-control"
-              type="text"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-            />
+        {currentAccount && (
+          <div className="row">
+            <form onSubmit={handleFormSubmit} className="">
+              <div className="col">
+                <label htmlFor="sendMessage" className="form-label">
+                  Your message
+                </label>
+                <input
+                  id="sendMessage"
+                  className="form-control"
+                  type="text"
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                />
               </div>
-              
-<div className="col" >
-            <input
-              className="btn btn-outline-success"
-              //onClick={wave(text)}
-              type="submit"
-              value="Submit"
-            /></div>
-              
-            
-          </form>
+
+              <div className="col">
+                <input
+                  className="btn btn-outline-success"
+                  //onClick={wave(text)}
+                  type="submit"
+                  value="Submit"
+                />
+              </div>
+            </form>
           </div>
         )}
 
@@ -186,10 +188,10 @@ const App = () => {
 
         {allWaves.map((wave, index) => {
           return (
-            <div className="card my-3 "  key={index}>
+            <div className="card my-3 " key={index}>
               <div class="card-header">Time: {wave.timestamp.toString()}</div>
               <div>Address: {wave.address}</div>
-             
+
               <div>Message: {wave.message}</div>
             </div>
           );
